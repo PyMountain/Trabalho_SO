@@ -29,11 +29,13 @@ int main(){
             fprintf(stderr, "msgrcv failed with error: %d\n", errno);
             exit(EXIT_FAILURE);
         }
-        printf("iniciou Musica: %s\n", song.nome);
+        printf("Musica: \n Nome: %s, Autor: %s,  Duracao: 00:0%i, Gênero: %s\n",  song.nome, song.autor, song.duracao, song.genero);
         // FIM DA REGIÃO CRÍTICA
         sleep(song.duracao);
         printf("finalizou Musica: %s\n\n", song.nome);
        // ou aqui... não tenho certeza
+           
+        
     }
 
     if (msgctl(msgid, IPC_RMID, 0) == -1) {
