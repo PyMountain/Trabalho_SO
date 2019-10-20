@@ -13,7 +13,7 @@
 
 void *create_song(void *arg);
 
-char random_phrases[15][50] = {" rock ", " pop ", " funk ", " macacos ", " sabrina ", " super ", " super ", " amor ", " destruidores ", " the ", " the ", " detonator ", "love", "importa", "UAU"};
+char random_phrases[15][30] = {" rock ", " pop ", " funk ", " macacos ", " sabrina ", " super ", " super ", " amor ", " destruidores ", " the ", " the ", " detonator ", "love", "importa", "UAU"};
 
 int msgid;
 
@@ -26,8 +26,9 @@ int main() {
 
     while(1){
         for(thread_index = 0; thread_index < NUM_THREADS; thread_index++) {
+            
 
-            res = pthread_create(&(a_thread[thread_index]), NULL, create_song, (void *)&thread_index);
+            res = pthread_create(&(a_thread[thread_index]), NULL, create_song, (void *)thread_index);
             if (res != 0) {
                 perror("Criacao de Thread falhou");
                 exit(EXIT_FAILURE);
@@ -48,19 +49,23 @@ int main() {
 }
 
 void *create_song(void *arg) {
-    struct song new_song = {
-        1,
-        *random_phrases[(int)(rand() % (14 - 0 + 1)) + 0],
-        *random_phrases[(int)(rand() % (14 - 0 + 1)) + 0],
-        1+(int)(9.0*rand()/(RAND_MAX+1.0)),
-        *random_phrases[((int)(rand() % (14 - 0 + 1)) + 0)]
-    };
+    long tid;
+    tid = (long)arg; 
+    printf("thread %ld iniciou criacao\n\n", tid);
+    struct song new_song;
+        new_song.tipo_musica = 1;
+        strncpy(new_song.nome, random_phrases[(int)(rand() % (14 - 0 + 1)) + 0], 30);
+        strncpy(new_song.autor, random_phrases[(int)(rand() % (14 - 0 + 1)) + 0], 30);
+        new_song.duracao = +(int)(9.0*rand()/(RAND_MAX+1.0));
+        strncpy(new_song.genero, random_phrases[((int)(rand() % (14 - 0 + 1)) + 0)], 30);
+
     // REGIÃO CRÍTICA!!
     if (msgsnd(msgid, (void *)&new_song, MAX_TEXT, 0) == -1) {
         fprintf(stderr, "falha ao adicionar a música na fila: %d \n", errno);
         exit(EXIT_FAILURE);
     } else {
-        printf("criou a música: %s\n", new_song);
+        printf("criou a música: \n nome: %s\n autor: %s \n duracao: %i \n genero: %s\n",  new_song.nome, new_song.autor, new_song.duracao, new_song.genero);
+        printf("thread %ld finalizou criacao\n\n", tid);
     }
 
     sleep(1);

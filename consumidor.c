@@ -29,9 +29,10 @@ int main(){
             fprintf(stderr, "msgrcv failed with error: %d\n", errno);
             exit(EXIT_FAILURE);
         }
-        printf("Musica: %s", song.nome);
+        printf("iniciou Musica: %s\n", song.nome);
         // FIM DA REGIÃO CRÍTICA
         sleep(song.duracao);
+        printf("finalizou Musica: %s\n\n", song.nome);
        // ou aqui... não tenho certeza
     }
 
