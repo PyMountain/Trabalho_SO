@@ -34,9 +34,6 @@ int main(){
         // FIM DA REGIÃO CRÍTICA
         sleep(song.duracao);
         printf("finalizou Musica: %s\n\n", song.nome);
-       // ou aqui... não tenho certeza
-           
-        
     }
 
     if (msgctl(msgid, IPC_RMID, 0) == -1) {
