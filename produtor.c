@@ -5,6 +5,7 @@
 #include <sys/msg.h>
 #include <errno.h>
 #include <string.h>
+#include <semaphore.h>
 
 #define NUM_THREADS 6
 #define MAX_TEXT 512
@@ -18,19 +19,21 @@ char random_autor[55][30] = {" Nirvana ", " ACDC ", " Imagine Dragons ", " 21 Pi
 char random_genero[9][30] = {" rock ", " pop ", " funk ", " jazz ", " eletronica ", " classica ", " MPB ", " Samba ", " Pagode "};
 
 int msgid;
+sem_t sem;
 
 int main() {
     int res;
     pthread_t a_thread[NUM_THREADS];
     void *thread_result;
     int thread_index;
+    sem_init(&sem, 0, 1);
     msgid = msgget((key_t)1234, 0666 | IPC_CREAT);
 
     while(1){
         for(thread_index = 0; thread_index < NUM_THREADS; thread_index++) {
             
 
-            res = pthread_create(&(a_thread[thread_index]), NULL, create_song, (void *)thread_index);
+            res = pthread_create(&(a_thread[thread_index]), NULL, create_song, (void *)&thread_index);
             if (res != 0) {
                 perror("Criacao de Thread falhou");
                 exit(EXIT_FAILURE);
@@ -53,6 +56,7 @@ int main() {
 void *create_song(void *arg) {
     long tid;
     tid = (long)arg; 
+    sem_wait(&sem);
     printf("thread %ld iniciou criacao\n\n", tid);
     struct song new_song;
         new_song.tipo_musica = 1;
@@ -61,7 +65,6 @@ void *create_song(void *arg) {
         new_song.duracao = +(int)(9.0*rand()/(RAND_MAX+1.0));
         strncpy(new_song.genero, random_genero[((int)(rand() % (9)) + 0)], 30);
 
-    // REGIÃO CRÍTICA!!
     if (msgsnd(msgid, (void *)&new_song, MAX_TEXT, 0) == -1) {
         fprintf(stderr, "falha ao adicionar a música na fila: %d \n", errno);
         exit(EXIT_FAILURE);
@@ -71,6 +74,6 @@ void *create_song(void *arg) {
     }
 
     sleep(2);
-    // FIM DA REGIÃO CRÍTICA
+    sem_post(&sem);
     pthread_exit(NULL);
 }

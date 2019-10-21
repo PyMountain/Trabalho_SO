@@ -5,6 +5,7 @@
 #include <sys/msg.h>
 #include <errno.h>
 #include <string.h>
+#include <semaphore.h>
 
 #include <sys/msg.h>
 
